@@ -1,18 +1,34 @@
+#[allow(unused_macros)]
+macro_rules! read {
+    ($out:ident as $type:ty) => {
+        let mut inner = String::new();
+        std::io::stdin().read_line(&mut inner).expect("A String");
+        let $out = inner.trim().parse::<$type>().expect("Parsable");
+    };
+}
+
+#[allow(unused_macros)]
+macro_rules! read_vec {
+    ($out:ident as $type:ty) => {
+        let mut inner = String::new();
+        std::io::stdin().read_line(&mut inner).unwrap();
+        let $out = inner
+            .trim()
+            .split_whitespace()
+            .map(|s| s.parse::<$type>().unwrap())
+            .collect::<Vec<$type>>();
+    };
+}
+
 fn main() {
     let mut array = vec![];
-    array = solve(
-        array,
-        vec![
-            vec![2, 1, 4],
-            vec![1, 1],
-            vec![1, 4],
-            vec![1, 2],
-            vec![2, 2, 4],
-            vec![2, 4, 3],
-            vec![1, 2],
-            vec![2, 2, 7],
-        ],
-    );
+    read!(number_of_queries as usize);
+    let mut queries: Vec<Vec<usize>> = Vec::new();
+    for _ in 0..number_of_queries {
+        read_vec!(query as usize);
+        queries.push(query);
+    }
+    array = solve(array, queries);
 
     println!("{:?}", array);
 }
