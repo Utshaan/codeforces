@@ -1,4 +1,5 @@
-#[allow(unused_macros)]
+use std::collections::HashMap;
+
 macro_rules! read {
     ($out:ident as $type:ty) => {
         let mut inner = String::new();
@@ -7,7 +8,6 @@ macro_rules! read {
     };
 }
 
-#[allow(unused_macros)]
 macro_rules! read_vec {
     ($out:ident as $type:ty) => {
         let mut inner = String::new();
@@ -28,22 +28,30 @@ fn main() {
         read_vec!(query as usize);
         queries.push(query);
     }
+
     array = solve(array, queries);
 
-    println!("{:?}", array);
+    array.into_iter().rev().for_each(|x| print!("{x} "));
+    println!();
 }
 
 fn solve(mut array: Vec<usize>, queries: Vec<Vec<usize>>) -> Vec<usize> {
-    for mut query in queries {
+    let mut transformations: HashMap<usize, usize> = HashMap::new();
+    for mut query in queries.into_iter().rev() {
         match query.remove(0) {
             1 => {
-                array.append(&mut vec![query.remove(0)]);
+                if transformations.contains_key(&query[0]) {
+                    array.append(&mut vec![*transformations.get(&query[0]).unwrap()]);
+                } else {
+                    array.append(&mut vec![query.remove(0)]);
+                }
             }
             2 => {
-                array = array
-                    .into_iter()
-                    .map(|x| if x == query[0] { query[1] } else { x })
-                    .collect();
+                let p = transformations.get(&query[1]).unwrap_or(&query[1]).clone();
+                transformations
+                    .entry(query[0])
+                    .and_modify(|e| *e = p)
+                    .or_insert(query[1]);
             }
             _ => panic!("Invalid query"),
         }
